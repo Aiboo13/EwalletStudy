@@ -1,0 +1,91 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Controllers\Controller;
+use App\Models\Wallets;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+
+class WalletsController extends Controller
+{
+    // menampilkan saldo wallet user
+        function index(){
+        $user = JWTAuth::parsetoken()->authenticate();
+        $wallet = Wallets::where('user_id', $user->id)->first();
+        if($wallet){
+            return response()->json([
+                'status' => 'succes',
+                'massage' => 'Wallet found',
+                'with balance' => $wallet->balance
+            ], 200);
+        }else{
+            return response()->json([
+                'status' => 'error',
+                'massage' => 'Wallet not found'
+            ], 404);
+        }
+
+        try{
+        $user = JWTAuth::parseToken()->authenticate();
+        }catch(\Exception $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Token invalid'
+            ], 401);
+        }
+
+    }
+
+    function deposit(Request $request){
+        $user = JWTAuth::parsetoken()->authenticate();
+        $wallet = Wallets::where('user_id', $user->id)->first();
+        $validator = Validator::make($request->all(),[
+            'amount' => 'required|numeric|min:1000',
+        ]);
+
+        if($validator->fails()){
+            return response()->json([
+                'status' => 'error',
+                'message' => $validator->errors()
+            ], 400);
+        }
+        $wallet->balance += $request->amount;
+        $wallet->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Deposit successful',
+            'new_balance' => $wallet->balance
+        ], 200);
+    }
+
+    function withdraw(Request $request){
+        $user = JWTAuth::parsetoken()->authenticate();
+        $wallet = Wallets::where('user_id', $user->id)->first();
+        $validator = Validator::make($request->all(),[
+            'amount' => 'required|numeric|min:1000',
+        ]);
+
+        if($validator->fails()){
+            return response()->json([
+                'status' => 'error',
+                'message' => $validator->errors()
+            ], 400);
+        }
+        if($wallet->balance < $request->amount){
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Insufficient balance'
+            ], 400);
+        }
+        $wallet->balance -= $request->amount;
+        $wallet->save();
+        return response()->json([
+            'status' => 'success',
+            'message' => 'withdraw successful',
+            'new_balance' => $wallet->balance
+        ], 200);
+    }
+}
