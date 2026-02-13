@@ -15,7 +15,7 @@ class Wallets extends Seeder
     {
         DB::table('wallets')->insert([
             [
-                'user_id' => 1,
+                'user_id' => 2,
                 'balance' => 1000000, // Saldo awal untuk user 1
                 'created_at' => now(),
                 'updated_at' => now(),

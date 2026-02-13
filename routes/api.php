@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\WalletsController;
+use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\transfersController;
 use GuzzleHttp\Middleware;
 
 Route::prefix('auth')->name('auth.')->group(function () {
@@ -22,6 +24,16 @@ Route::prefix('v1')->group(function(){
         Route::post('/wallet/deposit', [WalletsController::class, 'deposit'])->name('wallet.deposit');
         Route::post('/wallet/withdraw', [WalletsController::class, 'withdraw'])->name('wallet.withdraw');
     });
+
+    Route::middleware('jwt')->group(function () {
+        Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
+        Route::get('/transactions/{id}', [TransactionController::class, 'show'])->name('transactions.show');
+    });
+
+    Route::middleware('jwt')->group(function () {
+        Route::post('/transfers', [transfersController::class, 'transfers'])->name('transfers');
+    });
+
 });
 
 

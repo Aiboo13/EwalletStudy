@@ -23,14 +23,14 @@ return new class extends Migration
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('wallet_id')->constrained()->onDelete('cascade');
-            $table->string('type');         // topup, transfer, payment
+            $table->string('type');         // topup, transfers, payment
             $table->decimal('amount', 15, 2);
             $table->string('status');       // pending, success, failed
             $table->string('description')->nullable();
             $table->timestamps();
         });
 
-        Schema::create('transfers', function (Blueprint $table) {
+        Schema::create('transferss', function (Blueprint $table) {
             $table->id();
             $table->foreignId('sender_wallet_id')->constrained('wallets')->onDelete('cascade');
             $table->foreignId('receiver_wallet_id')->constrained('wallets')->onDelete('cascade');
@@ -47,6 +47,6 @@ return new class extends Migration
         Schema::dropIfExists('table');
         Schema::dropIfExists('wallets');
         Schema::dropIfExists('transactions');
-        Schema::dropIfExists('transfers');
+        Schema::dropIfExists('transferss');
     }
 };

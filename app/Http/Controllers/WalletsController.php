@@ -7,12 +7,12 @@ use App\Models\Wallets;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-
+use Exception;
 class WalletsController extends Controller
 {
     // menampilkan saldo wallet user
         function index(){
-        $user = JWTAuth::parsetoken()->authenticate();
+            $user = JWTAuth::parsetoken()->authenticate();
         $wallet = Wallets::where('user_id', $user->id)->first();
         if($wallet){
             return response()->json([
@@ -25,15 +25,6 @@ class WalletsController extends Controller
                 'status' => 'error',
                 'massage' => 'Wallet not found'
             ], 404);
-        }
-
-        try{
-        $user = JWTAuth::parseToken()->authenticate();
-        }catch(\Exception $e){
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Token invalid'
-            ], 401);
         }
 
     }
@@ -51,6 +42,7 @@ class WalletsController extends Controller
                 'message' => $validator->errors()
             ], 400);
         }
+        // tambah saldo
         $wallet->balance += $request->amount;
         $wallet->save();
 
@@ -61,6 +53,7 @@ class WalletsController extends Controller
         ], 200);
     }
 
+    // menarik saldo dari wallet user
     function withdraw(Request $request){
         $user = JWTAuth::parsetoken()->authenticate();
         $wallet = Wallets::where('user_id', $user->id)->first();
@@ -80,6 +73,7 @@ class WalletsController extends Controller
                 'message' => 'Insufficient balance'
             ], 400);
         }
+        // melakukan penarikan saldo
         $wallet->balance -= $request->amount;
         $wallet->save();
         return response()->json([

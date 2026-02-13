@@ -1,3 +1,7 @@
 - date 11-02-2026
   - pembuatan user(register,login,Check user login)
   - pembuatan api wallet (Check Saldo, deposit, witdarw)
+- date: 13-02-2026
+  - Pembuatan api Transaction
+  - selalu perhatikan pada nama table dan file migration
+  - menambahkan api tranfers
