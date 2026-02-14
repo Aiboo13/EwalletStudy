@@ -41,6 +41,13 @@ class transfersController extends Controller
         $wallet->save();
         $request = $request->merge(['sender_wallet_id' => $wallet->id, 'status' => 'success']);
         transfer::create($request->all());
+        transaction::create([
+            'wallet_id' => $wallet->id,
+            'type' => 'transfer',
+            'amount' => $request->amount,
+            'status' => 'success',
+            'description' => 'Transfer to wallet id '.$request->receiver_wallet_id
+        ]);
         // tambah saldo penerima
         $receiverWallet = Wallets::where('id', $request->receiver_wallet_id)->first();
         $receiverWallet->balance += $request->amount;

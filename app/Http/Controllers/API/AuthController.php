@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Wallets;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
+// use App\Http\Controllers\WalletsController;
 
 class AuthController extends Controller
 {
@@ -39,15 +41,21 @@ class AuthController extends Controller
 
         $token = JWTAuth::fromUser($user);
 
+        $wallet = Wallets::create([
+            'id' => $user->id,
+            'user_id' => $user->id,
+            'balance' => 0,
+        ]);
         return response()->json([
             'status'  => 'success',
             'message' => 'User successfully registered',
             'data'    => [
                 'user'  => $user,
                 'token' => $this->respondWithToken($token),
-            ]
+            ],
+            'Wallet' => $wallet
         ], 201);
-    }
+}
 
     /**
      * Login user
@@ -128,11 +136,13 @@ class AuthController extends Controller
     {
         try {
             $user = JWTAuth::parseToken()->authenticate();
+            $walletId = Wallets::where('user_id', $user->id)->first();
 
             return response()->json([
                 'status'  => 'success',
                 'message' => 'User profile fetched',
-                'data'    => $user
+                'data'    => $user,
+                'walletID'  => $walletId->id
             ]);
         } catch (JWTException $e) {
             return response()->json([

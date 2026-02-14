@@ -7,6 +7,7 @@ use App\Models\Wallets;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Transaction;
 use Exception;
 class WalletsController extends Controller
 {
@@ -45,7 +46,13 @@ class WalletsController extends Controller
         // tambah saldo
         $wallet->balance += $request->amount;
         $wallet->save();
-
+        Transaction::create([
+            'wallet_id' => $wallet->id,
+            'type' => 'deposit',
+            'amount' => $request->amount,
+            'status' => 'success',
+            'description' => 'Deposit to wallet'
+        ]);
         return response()->json([
             'status' => 'success',
             'message' => 'Deposit successful',
@@ -76,6 +83,13 @@ class WalletsController extends Controller
         // melakukan penarikan saldo
         $wallet->balance -= $request->amount;
         $wallet->save();
+        Transaction::create([
+            'wallet_id' => $wallet->id,
+            'type' => 'withdraw',
+            'amount' => $request->amount,
+            'status' => 'success',
+            'description' => 'Withdraw from wallet'
+        ]);
         return response()->json([
             'status' => 'success',
             'message' => 'withdraw successful',

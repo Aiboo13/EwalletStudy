@@ -61,4 +61,9 @@ class User extends Authenticatable implements JWTSubject
             'role' => $this->role,
         ];
     }
+
+    public function wallet()
+    {
+        return $this->hasOne(Wallets::class);
+    }
 }
